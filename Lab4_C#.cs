@@ -44,7 +44,7 @@ namespace LabC_2
         }
     }
 
-    class Auto:Transport, IYear
+    class Auto:Transport, IYearble
     {
         public string CompanyName_Car { get; set; }
         public string Model_Car { get; set; }
@@ -243,14 +243,14 @@ namespace LabC_2
         }
     }
 
-    interface ISpeed
+    interface ISpeedble
     {
         public void autoIsSpeed();
         int Speed { get; set; }
 
     }
 
-    interface IYear
+    interface IYearble
     {
         public void transportIsYear();
         int Year_Of_Release { get;}
@@ -258,21 +258,30 @@ namespace LabC_2
     }
 
 
-    class AutoTrans : IComparable<AutoTrans>, ISpeed, IYear
+    class AutoTrans : IComparable<AutoTrans>, ISpeedble, IYearble
     {
+
+        
         public string CompanyName_Car { get; set; }
         public string Model_Car { get; set; }
         public int Force_Engine { get; set; }
         public int Year_Of_Release { get; set; }
         public int Speed { get; set; }
 
+
+
         public AutoTrans() { }
         public AutoTrans(string CompanyName_Car, string Model_Car, int Force_Engine, int Year_Of_Release)
         {
+
             this.CompanyName_Car = CompanyName_Car;
             this.Model_Car = Model_Car;
             this.Force_Engine = Force_Engine;
             this.Year_Of_Release = Year_Of_Release;
+            CreateCar += createCar;
+            CreateCar();
+
+
         }
 
         // Реализуем интерфейс IComparable<T>
@@ -303,7 +312,21 @@ namespace LabC_2
 
         }
 
-         public void autoIsSpeed()
+        public void createInfo()
+        {
+
+            Console.WriteLine($"\n------Ты выбрал автомобиль {CompanyName_Car} {Model_Car} -------------------------");
+            Console.WriteLine($"Марка автомобиля: {CompanyName_Car}");
+            Console.WriteLine($"Модель автомобиля: {Model_Car}");
+            Console.WriteLine($"Мощность двигателя автомобиля: {Force_Engine} л.с");
+            Console.WriteLine($"Год выпуска автомобиля: {Year_Of_Release} год");
+
+        }
+
+
+
+
+        public void autoIsSpeed()
         {
             if(Speed < 0)
             {
@@ -347,12 +370,128 @@ namespace LabC_2
             }
         }
 
+
+        public static void StartEngine()
+        {
+            Console.WriteLine("Запустился двигатель");
+        }
+
+        public static void LumpCar()
+        {
+            Console.WriteLine("Загорелась приборная панель");
+        }
+
+        public static void StartRadio()
+        {
+            Console.WriteLine("Включилось радио");
+        }
+
+        public static void CheckCarBelt()
+        {
+            Console.WriteLine("Пристегните ремень безопасности!");
+        }
+
+
+
+        private static void DisplayMessage(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        private static void DisplayRedMessage(string message)
+        {
+            
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            
+            Console.ResetColor();
+        }
+
+        private static void DisplayBlueMessage(string message)
+        {
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(message);
+
+            Console.ResetColor();
+        }
+
+        private static void DisplayGreenMessage(string message)
+        {
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+
+            Console.ResetColor();
+        }
+
+        public void ChooseCar()
+        {
+            CreateCar -= createCar;
+            CreateCar += createInfo;
+            CreateCar();
+
+
+
+            if (Year_Of_Release < 1950)
+            {
+                YearCarTest += DisplayRedMessage;
+                YearCarTest?.Invoke("Где ты откопал такую старую машину");
+            }
+            else if (Year_Of_Release >= 1950 && Year_Of_Release < 2000)
+            {
+                YearCarTest += DisplayRedMessage;
+                YearCarTest?.Invoke("Ты выбрал старую машину... Зачем?");
+            }
+            else if (Year_Of_Release >= 2000 && Year_Of_Release < 2010)
+            {
+                YearCarTest += DisplayBlueMessage;
+                YearCarTest?.Invoke("Ты выбрал обычную машину... Ты поехал в офис на работу?");
+                
+            }
+
+
+            else if (Year_Of_Release >= 2010 && Year_Of_Release < 2020)
+            {
+                YearCarTest += DisplayGreenMessage;
+                YearCarTest?.Invoke("Ух ты! Ты выбрал новенькую машину... ");
+            }
+            else
+            {
+                YearCarTest -= DisplayMessage;
+                YearCarTest += DisplayGreenMessage;
+                YearCarTest?.Invoke("Да ты серьезно? Ты выбрал очень современную и новую машину... ");
+            }
+
+        }
+
+        public void createCar()
+        {
+            Console.WriteLine($"Ты создал автомобиль {CompanyName_Car} {Model_Car} ...") ;
+        }
+
+
+
+        public event DifferentMessage YearCarTest;
+        public event CarAlert CreateCar;
+
+
     }
+
+    public delegate void CarAlert();
+    public delegate void DifferentMessage(string Message);
+
+
+
 
     class Program
     {
         static void Main(string[] args)
         {
+
+            //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            Console.WriteLine("\n ---------------------------------------Лабораторная работа 2-----------------------------------------------\n");
+
             Auto car1 = new Oil_Auto { CompanyName_Car = "BMW", Model_Car = "M5", Force_Engine = 425, Volume_GasTank = 45, Year_Of_Release = 2011 };
             Auto car2 = new Oil_Auto { CompanyName_Car = "Toyota", Model_Car = "Yaris", Force_Engine = 95, Volume_GasTank = 35, Year_Of_Release = 2001 };
             Auto car3 = new Electric_Auto { CompanyName_Car = "Tesla", Model_Car = "Model X", Force_Engine = 247, Year_Of_Release = 2020, Volume_Battery = 4555 };
@@ -373,8 +512,8 @@ namespace LabC_2
 
             ship2.StartEngine();
             ship2.Info();
-
-            //---------------------------------------------------------------------------------------------------------------------
+            
+            //----------------------------------------------------------------------------------------------------------------------------------------------------------------------
             Console.WriteLine("\n ---------------------------------------Лабораторная работа 3-----------------------------------------------\n");
 
 
@@ -426,6 +565,7 @@ namespace LabC_2
             carList.Add(new AutoTrans("Toyota", "Yaris", 95, 2001));
             carList.Add(new AutoTrans("Tesla", "Model X", 247, 2020));
             carList.Add(new AutoTrans("Iveco", "Eurocargo", 837, 2006));
+            Console.WriteLine();
 
             Console.WriteLine("Исходный каталог добавленных автомобилей: \n");
             foreach (AutoTrans object_auto in carList)
@@ -491,14 +631,47 @@ namespace LabC_2
             foreach (AutoTrans object_auto in autoList)
                 Console.WriteLine(object_auto);
 
+            Console.WriteLine();
 
 
 
 
 
+            AutoTrans carTest = new AutoTrans("BMW", "M5", 425, 2011);
+            Console.WriteLine();
 
+            CarAlert carTestMess = new CarAlert(AutoTrans.StartEngine);
+            carTestMess += AutoTrans.LumpCar;
+            carTestMess += AutoTrans.StartRadio;
+            carTestMess += AutoTrans.CheckCarBelt;
+            carTestMess.Invoke();
+
+
+            Console.WriteLine();
             Console.ReadKey();
 
+
+            AutoTrans OldCar = new AutoTrans("BMW", "X5", 478, 1947);
+            AutoTrans UsuallyCar = new AutoTrans("Audi", "Q6", 372, 2003);
+            AutoTrans NewCar = new AutoTrans("Toyota", "Avensis", 278, 2021);
+
+            OldCar.ChooseCar();
+            Console.WriteLine();
+            Console.ReadKey();
+
+
+            UsuallyCar.ChooseCar();
+            Console.WriteLine();
+            Console.ReadKey();
+
+
+
+            NewCar.ChooseCar();
+            Console.WriteLine();
+            Console.ReadKey();
+
+
+       
         }
     }
 }
